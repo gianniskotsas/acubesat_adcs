@@ -5,6 +5,7 @@ int valueBig = 0;
 int i=0;
 int aux = 0;
 int aux1 = 0;
+int motor = 10;
 
 float error=0;
 
@@ -31,10 +32,12 @@ void setup() {
 }
 
 void loop() {
+  int pid_sum = 0;
+  
   valueSmall = analogRead(photoresistorSmall);
   valueBig = analogRead(photoresistorBig);
-  Serial.println(valueSmall);
-  Serial.println(valueBig);
+  //Serial.println(valueSmall);
+  //Serial.println(valueBig);
 
   error=valueSmall-valueBig; // The error is the difference between the two photoresistors
 
@@ -46,12 +49,15 @@ void loop() {
   //Integral & Derivative
 
   derivative=0;
-  while(i<20){
+  //while(i<8){
     valueSmall=analogRead(photoresistorSmall);
     valueBig=analogRead(photoresistorBig);
     aux=valueSmall-valueBig;
     
     ti=millis(); // Inserts time passed until this point of the loop
+    
+    Serial.print("ti is:");
+    Serial.println(ti);
     
     //print time
     //Serial.print("Initial time:");
@@ -63,26 +69,38 @@ void loop() {
     
     tf=millis();
     
+    Serial.print("tf is:");
+    Serial.println(tf);
+    
     //print final time
     //Serial.print("Final time:");
     //Serial.println(ti);
     
-    incT=(tf-ti)/1000;              // Calculate in ms
+    incT=(tf-ti)/1000;   // Calculate in ms
     
     derivative=derivative+(aux1-aux)/incT; 
     integral=integral+(aux1+aux)*incT/2;
     
     i++;        
-  }
+  //}
   
 i=0;
 
-derivative=kd*(derivative/20);
+derivative=kd*(derivative/8);
 integral=ki*integral;
 
-int pid_sum=0;
+
+Serial.print("Derivative:");
+Serial.println(derivative);
+Serial.print("Integral:");
+Serial.println(integral);
+Serial.print("Proportional:");
+Serial.println(proportional);
 
 pid_sum = derivative + integral + proportional;
+
+Serial.print("PID value =");
+Serial.println(pid_sum);
 
 if(pid_sum > 5)
   {
@@ -94,12 +112,14 @@ if(pid_sum < 0)
     pid_sum = 0;
   }
 
-map(0,5,0,255,pid_sum);
+pid_sum = map(pid_sum,0, 5,0, 255);
 
-Serial.print("PWM signal is:");
+Serial.print("PWM signal after mapping is:");
 Serial.println(pid_sum);
 
-analogWrite(9, pid_sum);
+analogWrite(10, pid_sum);
+Serial.println("----------------------------");
+
 
 /* 
  * We are using only one transistor, so DC motor can turn into only one direction. In order to make the 
