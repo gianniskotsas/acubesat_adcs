@@ -47,6 +47,7 @@ void setup() {
   
   q = valueSmall-valueBig; // Initial Error
   q_int = q; // Error of integral
+  
   q_prev = q; // Previous error
   t_prev = millis();  // measure initial measurement time
  
@@ -57,17 +58,21 @@ void loop() {
 
   q = getError(); // Function that calculates the new error
   t_new = millis();
-
+ 
+  //Serial.print("q = ");
+  //Serial.println(q);
 
   //proportional
   proportional=k*q;
 
   //Integral & Derivative
 
-  dt = t_new - t_prev; // Difference between the 2 measurements
+  dt = (t_new - t_prev)/1000; // Difference between the 2 measurements
 
   derivative = (q-q_prev)/dt; 
+  
   q_prev = q;
+  t_prev = t_new;
 
   q_int = q_int + q * dt;
     
@@ -83,28 +88,18 @@ void loop() {
   Serial.print("PID value =");
   Serial.println(pid_sum);
   
-  if(pid_sum > 0){
-    
-    if(pid_sum > 5)
-      {
-        pid_sum = 5;
-      }
-      
-      pid_sum = map(pid_sum,0, 5,0, 255);
+  
+       if(pid_sum > 0){
+        
+      pid_sum = map(pid_sum,0, 40,0, 255);
       analogWrite(10, pid_sum);
-      analogWrite(11,0);
-  }else{
+       
+       }else{
+        
+        analogWrite(10,0);
+        
+       }
   
-  if(pid_sum < -5)
-    {
-      pid_sum = -5;
-    }
-  
-      pid_sum = map(-pid_sum,0, 5,0, 255);
-      analogWrite(11, pid_sum);
-      analogWrite(10, 0);
-      
-  }
   
   Serial.print("PWM signal after mapping is:");
   Serial.println(pid_sum);
