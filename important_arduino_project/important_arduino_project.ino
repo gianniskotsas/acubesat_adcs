@@ -3,10 +3,10 @@ int photoresistorBig = A1; // Photoresistor of the big breadboard
 int valueSmall = 0;
 int valueBig = 0;
 int i=0;
-int aux = 0;
-int aux1 = 0;
+int enablePin = 11;
 int motorRight = 10;
-int motorLeft = 11;
+int motorLeft = 9;
+
 
 float error=0;
 
@@ -29,8 +29,6 @@ int t_prev=0;
 int t_new = 0;
 int dt = 0;
 
-
-
 // Integer
 float ki = 0.2;
 float integral = 0;
@@ -38,9 +36,9 @@ float integral = 0;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600); // Enabling Serial Monitor [top-right]
-  pinMode(9, OUTPUT); // DC motor controller
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT);
+  pinMode(enablePin, OUTPUT);          // Control motor speed 
+  pinMode(motorRight, OUTPUT);         // Pins for 
+  pinMode(motorLeft, OUTPUT);          // direction 
   
   valueSmall=analogRead(photoresistorSmall); // get initial values
   valueBig=analogRead(photoresistorBig);
@@ -83,7 +81,7 @@ void loop() {
 
   
 
-  pid_sum = derivative + integral + proportional;
+  pid_sum = integral + proportional;
 
   Serial.print("PID value =");
   Serial.println(pid_sum);
@@ -91,12 +89,17 @@ void loop() {
   
        if(pid_sum > 0){
         
-      pid_sum = map(pid_sum,0, 40,0, 255);
-      analogWrite(10, pid_sum);
+      pid_sum = map(pid_sum,0, 40,70, 255);
+      analogWrite(enablePin, pid_sum);            //Control speed
+      digitalWrite(motorRight, HIGH);             //Control Direction
+      digitalWrite(motorLeft, LOW);
        
-       }else{
+       }else if(pid_sum < 0){
         
-        analogWrite(10,0);
+      pid_sum = map(-pid_sum,0, 40,70, 255);
+      analogWrite(enablePin, pid_sum);
+      digitalWrite(motorRight, LOW);
+      digitalWrite(motorLeft, HIGH);
         
        }
   
