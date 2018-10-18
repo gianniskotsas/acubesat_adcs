@@ -1,5 +1,5 @@
-int photoresistorSmall = A0; // Photoresistor of the small breadboard
-int photoresistorBig = A1; // Photoresistor of the big breadboard
+int photoresistorSmall = A2; // Photoresistor of the small breadboard
+int photoresistorBig = A3; // Photoresistor of the big breadboard
 int valueSmall = 0;
 int valueBig = 0;
 int i=0;
@@ -89,14 +89,14 @@ void loop() {
   
        if(pid_sum > 0){
         
-      pid_sum = map(pid_sum,0, 40,70, 255);
+      pid_sum = map(pid_sum,0, 50,30, 255);
       analogWrite(enablePin, pid_sum);            //Control speed
       digitalWrite(motorRight, HIGH);             //Control Direction
       digitalWrite(motorLeft, LOW);
        
        }else if(pid_sum < 0){
         
-      pid_sum = map(-pid_sum,0, 40,70, 255);
+      pid_sum = map(-pid_sum,0, 50,30, 255);
       analogWrite(enablePin, pid_sum);
       digitalWrite(motorRight, LOW);
       digitalWrite(motorLeft, HIGH);
